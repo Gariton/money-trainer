@@ -1,0 +1,111 @@
+name: money-trainer
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-money_trainer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-money_trainer}
+      POSTGRES_DB: ${POSTGRES_DB:-money_trainer}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: api
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-money_trainer}:${POSTGRES_PASSWORD:-money_trainer}@postgres:5432/${POSTGRES_DB:-money_trainer}
+      DATA_ROOT: /data
+      API_TOKEN: ${API_TOKEN:-local-development-token}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-20971520}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - money-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # Opt-in API with the real Ultralytics pre-annotation runtime. It uses a
+  # different host port so enabling the profile never conflicts with `api`.
+  api-ml:
+    profiles: ["inference"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: api-ml
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-money_trainer}:${POSTGRES_PASSWORD:-money_trainer}@postgres:5432/${POSTGRES_DB:-money_trainer}
+      DATA_ROOT: /data
+      API_TOKEN: ${API_TOKEN:-local-development-token}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-20971520}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${API_ML_PORT:-8001}:8000"
+    volumes:
+      - money-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: worker
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-money_trainer}:${POSTGRES_PASSWORD:-money_trainer}@postgres:5432/${POSTGRES_DB:-money_trainer}
+      DATA_ROOT: /data
+      API_TOKEN: ${API_TOKEN:-local-development-token}
+      WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-2}
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - money-data:/data
+    restart: unless-stopped
+
+  worker-gpu:
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: worker-ml
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-money_trainer}:${POSTGRES_PASSWORD:-money_trainer}@postgres:5432/${POSTGRES_DB:-money_trainer}
+      DATA_ROOT: /data
+      API_TOKEN: ${API_TOKEN:-local-development-token}
+      WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-2}
+    depends_on:
+      api:
+        condition: service_healthy
+    gpus:
+      - driver: nvidia
+        count: all
+        capabilities: [gpu]
+    volumes:
+      - money-data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  money-data:

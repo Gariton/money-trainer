@@ -1,0 +1,55 @@
+name: MoneyTrainer
+options:
+  bundleIdPrefix: dev.moneytrainer
+  deploymentTarget:
+    iOS: "26.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+targets:
+  MoneyTrainer:
+    type: application
+    platform: iOS
+    sources:
+      - path: MoneyTrainer
+        excludes:
+          - Info.plist
+    info:
+      path: MoneyTrainer/Info.plist
+      properties:
+        CFBundleDisplayName: Money Trainer
+        LSRequiresIPhoneOS: true
+        NSCameraUsageDescription: 硬貨画像の撮影とリアルタイムモデル評価にカメラを使用します。
+        NSLocalNetworkUsageDescription: ローカルの Money Trainer API に接続します。
+        NSPhotoLibraryUsageDescription: 学習用の硬貨画像を選択するために写真ライブラリを使用します。
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.moneytrainer.app
+        TARGETED_DEVICE_FAMILY: "1,2"
+    scheme:
+      testTargets:
+        - MoneyTrainerTests
+  MoneyTrainerTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - MoneyTrainerTests
+    dependencies:
+      - target: MoneyTrainer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.moneytrainer.tests

@@ -1,0 +1,31 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Runtime data and model artifacts
+data/
+artifacts/
+runs/
+*.pt
+*.mlmodel
+*.mlpackage/
+
+# The dependency-free Mock vertical slice ships one reviewed Core ML template.
+!training/money_trainer/assets/MockMoneyDetector.mlpackage/
+!training/money_trainer/assets/MockMoneyDetector.mlpackage/**
+
+# Xcode / SwiftPM user state
+DerivedData/
+.build/
+*.xcuserstate
+xcuserdata/
+ios/.swiftpm/

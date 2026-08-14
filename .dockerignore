@@ -1,0 +1,25 @@
+.git
+.gitignore
+.DS_Store
+.env
+.venv
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/.coverage
+**/htmlcov
+**/*.egg-info
+**/dist
+**/build
+
+# Docker images only copy server/ and training/.
+ios
+docs
+data
+artifacts
+runs
+**/DerivedData
+**/.build
+
