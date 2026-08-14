@@ -10,6 +10,7 @@ money-trainer/
 ```
 
 設計の詳細は [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) にあります。
+初回セットアップは [docs/SETUP.md](docs/SETUP.md) を参照してください。
 
 ## Quick start: Mock vertical slice
 
