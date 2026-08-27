@@ -1,43 +1,27 @@
 import SwiftUI
 
+/// 履歴は1行1Jobに圧縮する。詳細は別画面へ送る。
 struct TrainingJobRow: View {
     let job: TrainingJob
 
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                TrainingStatusIcon(status: job.status)
+        HStack(spacing: DesignTokens.Spacing.regular) {
+            TrainingStatusIcon(status: job.status)
+
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.hairline) {
                 Text(job.modelVersion ?? "Job \(job.id.prefix(8))")
-                    .bold()
-                Spacer()
-                Text(job.status.displayName)
+                    .font(.body.weight(.medium))
+                    .monospaced()
+                Text(job.createdAt, format: .dateTime.month().day().hour().minute())
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            LabeledContent("Stage", value: job.stageDisplayName)
+            Spacer(minLength: 0)
 
-            if !job.status.isTerminal {
-                ProgressView(value: job.normalizedProgress) {
-                    Text("Progress")
-                } currentValueLabel: {
-                    Text(job.normalizedProgress, format: .percent.precision(.fractionLength(0)))
-                        .monospacedDigit()
-                }
-            }
-
-            if let errorMessage = job.errorMessage {
-                Label(errorMessage, systemImage: "exclamationmark.octagon.fill")
-                    .foregroundStyle(.red)
-            }
-
-            ForEach(job.validationIssues) { issue in
-                Label(issue.message, systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-            }
-
-            Text(job.createdAt, format: .dateTime.year().month().day().hour().minute())
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            Text(job.status.displayName)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(TrainingStatusIcon(status: job.status).tint)
         }
         .accessibilityElement(children: .combine)
     }

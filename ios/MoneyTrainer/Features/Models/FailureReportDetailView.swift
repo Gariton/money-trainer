@@ -11,7 +11,7 @@ struct FailureReportDetailView: View {
     var body: some View {
         Group {
             if isLoading {
-                ProgressView("Reportを読み込み中")
+                ProgressView("読み込み中")
             } else if let image {
                 ScrollView([.horizontal, .vertical]) {
                     Image(uiImage: image)
@@ -21,9 +21,9 @@ struct FailureReportDetailView: View {
                 }
             } else {
                 ContentUnavailableView(
-                    "Reportを表示できません",
+                    "この失敗例は表示できません",
                     systemImage: "exclamationmark.triangle",
-                    description: Text(errorMessage ?? "画像形式ではありません。")
+                    description: Text(errorMessage ?? "画像として読み取れない形式です。")
                 )
             }
         }

@@ -26,6 +26,10 @@ struct DatasetService: DatasetServiceProtocol, Sendable {
         try await client.send(APIRequest(path: "datasets/images/\(id)"), as: DatasetImageRecord.self)
     }
 
+    func imageData(id: String) async throws -> Data {
+        try await client.sendData(APIRequest(path: "datasets/images/\(id)/file"))
+    }
+
     func upload(imageData: Data, metadata: DatasetImageUploadMetadata) async throws -> DatasetImageRecord {
         var form = MultipartFormData()
         form.appendFile(name: "image", filename: "capture.jpg", mimeType: "image/jpeg", contents: imageData)

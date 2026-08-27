@@ -8,32 +8,47 @@ struct BoundingBoxOutline: View {
     let requiresReview: Bool
     let overlayColor: Color
     let onSelect: () -> Void
+    let onBeginEdit: () -> Void
     let onMove: (NormalizedRect, CGSize) -> Void
 
     @State private var moveOrigin: NormalizedRect?
 
     private var lineWidth: CGFloat {
-        (isSelected ? 3 : DesignTokens.overlayLineWidth) / viewportScale
+        (isSelected
+            ? DesignTokens.selectedOverlayLineWidth
+            : DesignTokens.overlayLineWidth) / viewportScale
     }
     private var fillColor: Color {
         isSelected ? overlayColor.opacity(0.12) : .clear
     }
+    /// 要確認は色だけでなく破線でも区別する。色覚特性に依存させない。
+    private var strokeStyle: StrokeStyle {
+        StrokeStyle(
+            lineWidth: lineWidth,
+            dash: requiresReview ? [6 / viewportScale, 4 / viewportScale] : []
+        )
+    }
+
     var body: some View {
         ZStack {
             Rectangle()
                 .fill(fillColor)
+
+            // 明るい背景でも枠が沈まないよう、白の下線を敷いてから色を重ねる。
             Rectangle()
-                .strokeBorder(overlayColor, lineWidth: lineWidth)
+                .stroke(.white.opacity(0.7), lineWidth: lineWidth * 2)
+            Rectangle()
+                .stroke(overlayColor, style: strokeStyle)
         }
-            .frame(width: displaySize.width, height: displaySize.height)
-            .contentShape(.rect)
-            .onTapGesture(perform: onSelect)
-            .gesture(moveGesture)
-            .accessibilityLabel(annotation.denomination.displayName)
-            .accessibilityValue(accessibilityValue)
-            .accessibilityHint("ダブルタップで選択、ドラッグで移動できます")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction(named: "選択", onSelect)
+        .frame(width: displaySize.width, height: displaySize.height)
+        .contentShape(.rect)
+        .onTapGesture(perform: onSelect)
+        .gesture(moveGesture)
+        .accessibilityLabel(annotation.denomination.displayName)
+        .accessibilityValue(accessibilityValue)
+        .accessibilityHint("ダブルタップで選択、ドラッグで移動できます")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(named: "選択", onSelect)
     }
 
     private var moveGesture: some Gesture {
@@ -44,6 +59,7 @@ struct BoundingBoxOutline: View {
         .onChanged { value in
             if moveOrigin == nil {
                 moveOrigin = annotation.rect
+                onBeginEdit()
                 onSelect()
             }
             guard let moveOrigin else { return }

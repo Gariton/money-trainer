@@ -6,8 +6,7 @@ import Observation
 final class APIConfigurationStore {
     var baseURLText: String
     var token: String
-    var errorMessage: String?
-    var isShowingError = false
+    var error: AppError?
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let tokenStore: SecureTokenStore
@@ -32,25 +31,25 @@ final class APIConfigurationStore {
               let scheme = url.scheme?.lowercased(),
               scheme == "http" || scheme == "https",
               url.host != nil else {
-            errorMessage = "http または https の有効なAPI URLを入力してください。"
-            isShowingError = true
+            error = AppError(
+                kind: .validation,
+                title: "API URLが不正です",
+                message: "http または https から始まる有効なURLを入力してください。"
+            )
             return false
         }
         defaults.set(url.absoluteString, forKey: baseURLKey)
         do {
             try tokenStore.save(token)
-            errorMessage = nil
-            isShowingError = false
+            error = nil
             return true
         } catch {
-            errorMessage = error.localizedDescription
-            isShowingError = true
+            self.error = AppError(error, title: "設定を保存できません")
             return false
         }
     }
 
     func clearError() {
-        isShowingError = false
-        errorMessage = nil
+        error = nil
     }
 }

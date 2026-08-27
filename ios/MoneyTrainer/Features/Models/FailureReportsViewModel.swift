@@ -7,8 +7,7 @@ final class FailureReportsViewModel {
     let model: ModelRecord
     private(set) var sections: [FailureReportSection] = []
     private(set) var isLoading = false
-    var isShowingError = false
-    var errorMessage = ""
+    var error: AppError?
 
     @ObservationIgnored private let service: any ModelServiceProtocol
 
@@ -22,6 +21,7 @@ final class FailureReportsViewModel {
         defer { isLoading = false }
         do {
             let items = try await service.reports(modelID: model.id)
+            error = nil
             let grouped = Dictionary(grouping: items, by: \.category)
             sections = grouped.map { category, categoryItems in
                 FailureReportSection(
@@ -31,7 +31,7 @@ final class FailureReportsViewModel {
             }
             .sorted(by: { $0.category < $1.category })
         } catch {
-            showError(error.localizedDescription)
+            self.error = AppError(error, title: "失敗例を読み込めません")
         }
     }
 
@@ -40,12 +40,6 @@ final class FailureReportsViewModel {
     }
 
     func clearError() {
-        isShowingError = false
-        errorMessage = ""
-    }
-
-    private func showError(_ message: String) {
-        errorMessage = message
-        isShowingError = true
+        error = nil
     }
 }

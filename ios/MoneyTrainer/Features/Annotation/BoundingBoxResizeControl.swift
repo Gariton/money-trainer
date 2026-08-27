@@ -6,6 +6,7 @@ struct BoundingBoxResizeControl: View {
     let displaySize: CGSize
     let viewportScale: CGFloat
     let onSelect: () -> Void
+    let onBeginEdit: () -> Void
     let onResize: (NormalizedRect, BoundingBoxResizeHandle, CGSize) -> Void
 
     @State private var resizeOrigin: NormalizedRect?
@@ -17,7 +18,7 @@ struct BoundingBoxResizeControl: View {
         DesignTokens.minimumTapSize / viewportScale
     }
     private var borderWidth: CGFloat {
-        3 / viewportScale
+        DesignTokens.selectedOverlayLineWidth / viewportScale
     }
     private var handleOffset: CGSize {
         CGSize(
@@ -31,7 +32,7 @@ struct BoundingBoxResizeControl: View {
             .fill(.white)
             .overlay {
                 Circle()
-                    .strokeBorder(.blue, lineWidth: borderWidth)
+                    .strokeBorder(Color.mtAccent, lineWidth: borderWidth)
             }
             .frame(width: visualSize, height: visualSize)
             .frame(width: hitSize, height: hitSize)
@@ -54,6 +55,7 @@ struct BoundingBoxResizeControl: View {
         .onChanged { value in
             if resizeOrigin == nil {
                 resizeOrigin = annotation.rect
+                onBeginEdit()
                 onSelect()
             }
             guard let resizeOrigin else { return }
@@ -74,6 +76,7 @@ struct BoundingBoxResizeControl: View {
         @unknown default:
             return
         }
+        onBeginEdit()
         onResize(annotation.rect, handle, handle.diagonalTranslation(distance: distance))
     }
 }

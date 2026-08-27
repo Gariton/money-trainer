@@ -3,61 +3,69 @@ import SwiftUI
 struct LiveTestView: View {
     let modelManager: ModelManager
     let datasetService: any DatasetServiceProtocol
+    let onOpenModels: () -> Void
 
     @State private var viewModel = LiveTestViewModel()
 
     var body: some View {
         NavigationStack {
-            LiveCameraOverlayView(viewModel: viewModel)
-                .safeAreaInset(edge: .bottom) {
-                    CoinCountSummaryView(viewModel: viewModel, correctAction: showCorrectionMenu)
+            Group {
+                if viewModel.controller.hasActiveModel {
+                    cameraSurface
+                } else {
+                    noActiveModelState
                 }
-                .navigationTitle("Live Test")
-                .navigationBarTitleDisplayMode(.inline)
-                .overlay(alignment: .top) {
-                    if !viewModel.controller.hasActiveModel {
-                        Label("Activeモデルなし", systemImage: "exclamationmark.triangle.fill")
-                            .padding(8)
-                            .background(.regularMaterial)
-                            .clipShape(.rect(cornerRadius: DesignTokens.compactCornerRadius))
-                            .padding()
-                    }
-                }
-                .task { await viewModel.start(modelManager: modelManager) }
-                .onChange(of: modelManager.activeModelID) { _, _ in
-                    Task { await viewModel.updateModel(modelManager: modelManager) }
-                }
-                .onDisappear(perform: viewModel.controller.stop)
-                .confirmationDialog(
-                    "Correct Detection",
-                    isPresented: $viewModel.isShowingCorrectionMenu,
-                    titleVisibility: .visible
-                ) {
-                    ForEach(CoinDenomination.allCases) { denomination in
-                        Button(denomination.displayName) {
-                            viewModel.correctSelected(to: denomination)
-                        }
-                    }
-                } message: {
-                    Text("正しい金種を選ぶと、このFrameをAnnotation Editorで確認できます。")
-                }
-                .fullScreenCover(item: $viewModel.correctionDraft) { draft in
-                    AnnotationEditorView(draft: draft, service: datasetService) { }
-                }
-                .alert("Live Test Error", isPresented: $viewModel.isShowingError) {
-                    Button("OK", role: .cancel, action: viewModel.clearError)
-                } message: {
-                    Text(viewModel.errorMessage)
-                }
-                .alert("Camera Error", isPresented: $viewModel.controller.isShowingError) {
-                    Button("OK", role: .cancel, action: viewModel.controller.clearError)
-                } message: {
-                    Text(viewModel.controller.errorMessage)
-                }
+            }
+            .navigationTitle("実機テスト")
+            .navigationBarTitleDisplayMode(.inline)
+            .task { await viewModel.start(modelManager: modelManager) }
+            .onChange(of: modelManager.activeModelID) { _, _ in
+                Task { await viewModel.updateModel(modelManager: modelManager) }
+            }
+            .onDisappear(perform: viewModel.controller.stop)
+            .fullScreenCover(item: $viewModel.correctionDraft) { draft in
+                AnnotationEditorView(draft: draft, service: datasetService) { }
+            }
+            .alert("カメラエラー", isPresented: $viewModel.controller.isShowingError) {
+                Button("OK", role: .cancel, action: viewModel.controller.clearError)
+            } message: {
+                Text(viewModel.controller.errorMessage)
+            }
         }
     }
 
-    private func showCorrectionMenu() {
-        viewModel.isShowingCorrectionMenu = true
+    private var cameraSurface: some View {
+        LiveCameraOverlayView(viewModel: viewModel)
+            .safeAreaInset(edge: .bottom) {
+                LiveTestSummaryBar(viewModel: viewModel)
+            }
+            .safeAreaInset(edge: .top) {
+                if let error = viewModel.error {
+                    ErrorBanner(
+                        error: error,
+                        onDismiss: viewModel.clearError
+                    )
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Label(viewModel.activeModelLabel, systemImage: "shippingbox.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+    }
+
+    /// モデルがないままカメラを回し続けても意味がないので、ここで止めて導線を出す。
+    private var noActiveModelState: some View {
+        EmptyStateView(
+            title: "Activeなモデルがありません",
+            systemImage: "shippingbox",
+            message: "学習済みモデルを端末へダウンロードして有効化すると、ここで硬貨を数えられます。"
+        ) {
+            Button("モデルを選ぶ", systemImage: "arrow.right", action: onOpenModels)
+                .buttonStyle(.borderedProminent)
+        }
+        .onAppear(perform: viewModel.controller.stop)
     }
 }

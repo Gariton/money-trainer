@@ -4,28 +4,40 @@ struct BoundingBoxLabel: View {
     let annotation: Annotation
     let requiresReview: Bool
 
+    private var background: Color {
+        requiresReview ? .mtDanger : .black.opacity(0.75)
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        HStack(spacing: DesignTokens.Spacing.tight) {
             if annotation.needsReview == true && annotation.confidence == nil {
-                Label("円形候補", systemImage: "circle.dashed")
+                Image(systemName: "circle.dashed")
+                Text("円形候補")
                     .bold()
             } else {
                 Text(annotation.denomination.displayName)
                     .bold()
+                    .monospacedDigit()
             }
+
             if let confidence = annotation.confidence {
                 Text(confidence, format: .percent.precision(.fractionLength(0)))
+                    .monospacedDigit()
+                    .opacity(0.85)
             }
+
             if requiresReview {
-                Label("要確認", systemImage: "exclamationmark.triangle.fill")
-                    .bold()
+                Image(systemName: "exclamationmark.triangle.fill")
             }
         }
-        .font(.footnote)
-        .padding(4)
+        .font(.caption2)
+        .padding(.horizontal, DesignTokens.Spacing.compact)
+        .padding(.vertical, DesignTokens.Spacing.hairline)
         .foregroundStyle(.white)
-        .background(requiresReview ? Color.red : Color.black)
-        .clipShape(.rect(cornerRadius: 4))
+        .background(background, in: .capsule)
+        .overlay {
+            Capsule().strokeBorder(.white.opacity(0.35), lineWidth: 0.5)
+        }
         .accessibilityElement(children: .combine)
     }
 }

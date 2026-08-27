@@ -11,6 +11,7 @@ struct AnnotationCanvasView: View {
     @State private var panOriginOffset: CGSize?
     @State private var magnificationOriginScale: CGFloat?
     @State private var magnificationOriginOffset = CGSize.zero
+    @State private var isShowingHint = true
 
     var body: some View {
         let converter = AspectFitCoordinateConverter(
@@ -19,13 +20,17 @@ struct AnnotationCanvasView: View {
         )
 
         ZStack {
-            Color.black
+            Color.mtCanvas
 
             ZStack {
                 Rectangle()
                     .fill(.clear)
                     .contentShape(.rect)
-                    .gesture(panGesture(converter: converter))
+                    // ダブルタップが成立したときだけ追加し、それ以外はパンとして扱う。
+                    .gesture(
+                        addGesture(converter: converter)
+                            .exclusively(before: panGesture(converter: converter))
+                    )
 
                 Image(uiImage: viewModel.image)
                     .resizable()
@@ -40,6 +45,7 @@ struct AnnotationCanvasView: View {
                         viewportScale: viewportScale,
                         isSelected: annotation.id == viewModel.selectedAnnotationID,
                         onSelect: { viewModel.select(annotation.id) },
+                        onBeginEdit: viewModel.beginInteractiveEdit,
                         onMove: { initial, translation in
                             viewModel.move(
                                 id: annotation.id,
@@ -99,19 +105,57 @@ struct AnnotationCanvasView: View {
                     )
                 }
             )
-            .padding(12)
+            .padding(DesignTokens.Spacing.regular)
         }
         .overlay(alignment: .bottomLeading) {
-            Label("ピンチで拡大・背景ドラッグで移動", systemImage: "hand.pinch")
+            if isShowingHint {
+                Label(
+                    "ピンチで拡大・背景ドラッグで移動・ダブルタップで追加",
+                    systemImage: "hand.pinch"
+                )
                 .font(.caption)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .padding(.horizontal, DesignTokens.Spacing.regular)
+                .padding(.vertical, DesignTokens.Spacing.compact)
                 .background(.regularMaterial, in: .capsule)
-                .padding(12)
+                .padding(DesignTokens.Spacing.regular)
                 .allowsHitTesting(false)
+                .transition(.opacity)
+            }
+        }
+        .task {
+            // 常時表示して左下を占有し続けないよう、一度だけ出して消す。
+            try? await Task.sleep(for: DesignTokens.hintVisibleDuration)
+            withAnimation(.easeOut) { isShowingHint = false }
         }
         .sensoryFeedback(.selection, trigger: viewModel.selectedAnnotationID)
         .clipped()
+    }
+
+    // MARK: - Gestures
+
+    /// ダブルタップした位置に新しいBounding Boxを作る。中央固定の重なりを避ける。
+    private func addGesture(converter: AspectFitCoordinateConverter) -> some Gesture {
+        SpatialTapGesture(count: 2, coordinateSpace: .named(Self.coordinateSpaceName))
+            .onEnded { value in
+                let frame = converter.imageFrame
+                guard frame.width > 0, frame.height > 0 else { return }
+                let point = contentPoint(from: value.location)
+                let normalized = CGPoint(
+                    x: (point.x - frame.minX) / frame.width,
+                    y: (point.y - frame.minY) / frame.height
+                )
+                guard (0...1).contains(normalized.x), (0...1).contains(normalized.y) else { return }
+                viewModel.addAnnotation(atNormalizedCenter: normalized)
+            }
+    }
+
+    /// 画面座標を、拡大・移動を打ち消したキャンバス座標へ戻す。
+    private func contentPoint(from canvasPoint: CGPoint) -> CGPoint {
+        let center = CGPoint(x: canvasSize.width / 2, y: canvasSize.height / 2)
+        return CGPoint(
+            x: (canvasPoint.x - center.x - viewportOffset.width) / viewportScale + center.x,
+            y: (canvasPoint.y - center.y - viewportOffset.height) / viewportScale + center.y
+        )
     }
 
     private func panGesture(converter: AspectFitCoordinateConverter) -> some Gesture {

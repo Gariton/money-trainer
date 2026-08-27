@@ -8,10 +8,11 @@ final class DatasetViewModel {
     private(set) var images: [DatasetImageRecord] = []
     private(set) var isLoading = false
     private(set) var isPreparingDraft = false
-    var errorMessage: String?
+    private(set) var isOpeningExistingImage = false
+
+    var filter = DatasetFilter.all
+    var error: AppError?
     var informationalMessage: String?
-    var isShowingError = false
-    var isShowingInformation = false
 
     @ObservationIgnored private let datasetService: any DatasetServiceProtocol
     @ObservationIgnored private let inferenceService: any InferenceServiceProtocol
@@ -28,6 +29,22 @@ final class DatasetViewModel {
         self.circleDetector = circleDetector
     }
 
+    var filteredImages: [DatasetImageRecord] {
+        images.filter(filter.matches)
+    }
+
+    func count(for filter: DatasetFilter) -> Int {
+        images.count(where: filter.matches)
+    }
+
+    var isPresentingBlockingWork: Bool {
+        isPreparingDraft || isOpeningExistingImage
+    }
+
+    var blockingWorkMessage: String {
+        isOpeningExistingImage ? "画像を読み込み中" : "硬貨候補を検出中"
+    }
+
     func load() async {
         isLoading = true
         defer { isLoading = false }
@@ -36,9 +53,9 @@ final class DatasetViewModel {
             async let loadedPage = datasetService.images(limit: 50, offset: 0)
             stats = try await loadedStats
             images = try await loadedPage.items
-            errorMessage = nil
+            error = nil
         } catch {
-            presentError(error.localizedDescription)
+            present(error)
         }
     }
 
@@ -65,7 +82,6 @@ final class DatasetViewModel {
                 supplementalCircleCount: supplementalCount,
                 totalAnnotationCount: annotations.count
             )
-            isShowingInformation = informationalMessage != nil
             return AnnotationDraft(
                 imageData: imageData,
                 source: source,
@@ -79,7 +95,6 @@ final class DatasetViewModel {
             informationalMessage = annotations.isEmpty
                 ? "自動アノテーションに失敗しました。手動編集を続行できます。"
                 : "モデル推論に失敗したため、端末内で円形候補を\(annotations.count)件追加しました。金種と位置を確認してください。"
-            isShowingInformation = true
             return AnnotationDraft(
                 imageData: imageData,
                 source: source,
@@ -89,22 +104,43 @@ final class DatasetViewModel {
         }
     }
 
+    /// 既存のDataset画像を再アノテーションするためのDraftを作る。
+    func makeEditorDraft(for record: DatasetImageRecord) async -> AnnotationDraft? {
+        isOpeningExistingImage = true
+        defer { isOpeningExistingImage = false }
+        do {
+            let data = try await datasetService.imageData(id: record.id)
+            return AnnotationDraft(
+                imageData: data,
+                source: record.source,
+                captureSessionID: record.captureSessionID,
+                annotations: record.annotations,
+                modelVersionUsedForPreAnnotation: record.modelVersionUsedForPreAnnotation,
+                existingImageID: record.id
+            )
+        } catch {
+            present(error)
+            return nil
+        }
+    }
+
     func beginNewCaptureSession() {
         captureSessionID = UUID().uuidString
     }
 
-    func presentError(_ message: String) {
-        errorMessage = message
-        isShowingError = true
+    func present(_ error: any Error) {
+        self.error = AppError(error)
+    }
+
+    func present(message: String, title: String = "処理できませんでした") {
+        error = AppError(kind: .validation, title: title, message: message)
     }
 
     func clearError() {
-        isShowingError = false
-        errorMessage = nil
+        error = nil
     }
 
     func clearInformation() {
-        isShowingInformation = false
         informationalMessage = nil
     }
 

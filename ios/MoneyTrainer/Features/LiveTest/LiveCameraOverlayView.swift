@@ -11,6 +11,8 @@ struct LiveCameraOverlayView: View {
         )
         ZStack {
             CameraPreview(session: viewModel.controller.session, gravity: .resizeAspect)
+                .onTapGesture(perform: viewModel.clearSelection)
+
             ForEach(viewModel.controller.detections) { annotation in
                 LiveDetectionOverlay(
                     annotation: annotation,
@@ -20,7 +22,7 @@ struct LiveCameraOverlayView: View {
                 )
             }
         }
-        .background(.black)
+        .background(Color.mtCanvas)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { newSize in

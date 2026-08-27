@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct FailureReportsView: View {
-    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: FailureReportsViewModel
 
     init(model: ModelRecord, service: any ModelServiceProtocol) {
@@ -9,48 +8,47 @@ struct FailureReportsView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            List {
-                if viewModel.sections.isEmpty && !viewModel.isLoading {
-                    ContentUnavailableView(
-                        "Failure reportがありません",
-                        systemImage: "checkmark.circle",
-                        description: Text("このモデルでは失敗例が抽出されていません。")
-                    )
-                } else {
-                    ForEach(viewModel.sections) { section in
-                        Section(section.title) {
-                            ForEach(section.items) { item in
-                                NavigationLink(value: item) {
-                                    FailureReportRow(item: item)
-                                }
+        List {
+            if viewModel.sections.isEmpty && !viewModel.isLoading {
+                EmptyStateView(
+                    title: "失敗例がありません",
+                    systemImage: "checkmark.circle",
+                    message: "このモデルでは、誤検出・未検出のサンプルが抽出されていません。"
+                )
+                .listRowBackground(Color.clear)
+            } else {
+                ForEach(viewModel.sections) { section in
+                    Section(section.title) {
+                        ForEach(section.items) { item in
+                            NavigationLink(value: item) {
+                                FailureReportRow(item: item)
                             }
                         }
                     }
                 }
             }
-            .navigationTitle("\(viewModel.model.modelVersion) Reports")
-            .navigationDestination(for: FailureReportItem.self) { item in
-                FailureReportDetailView(item: item) {
-                    try await viewModel.data(for: item)
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("閉じる", systemImage: "xmark", action: dismiss.callAsFunction)
-                }
-            }
-            .overlay {
-                if viewModel.isLoading {
-                    ProgressView("Reportsを読み込み中")
-                }
-            }
-            .task { await viewModel.load() }
-            .alert("Report Error", isPresented: $viewModel.isShowingError) {
-                Button("OK", role: .cancel, action: viewModel.clearError)
-            } message: {
-                Text(viewModel.errorMessage)
+        }
+        .navigationTitle("失敗例")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: FailureReportItem.self) { item in
+            FailureReportDetailView(item: item) {
+                try await viewModel.data(for: item)
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if let error = viewModel.error {
+                ErrorBanner(
+                    error: error,
+                    onRetry: { Task { await viewModel.load() } },
+                    onDismiss: viewModel.clearError
+                )
+            }
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView("失敗例を読み込み中")
+            }
+        }
+        .task { await viewModel.load() }
     }
 }
