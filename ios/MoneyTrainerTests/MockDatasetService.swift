@@ -13,6 +13,7 @@ actor MockDatasetService: DatasetServiceProtocol {
     func stats() async throws -> DatasetStats { statsValue }
     func images(limit: Int, offset: Int) async throws -> DatasetImagePage { pageValue }
     func image(id: String) async throws -> DatasetImageRecord { pageValue.items[0] }
+    func imageData(id: String) async throws -> Data { Data() }
 
     func upload(imageData: Data, metadata: DatasetImageUploadMetadata) async throws -> DatasetImageRecord {
         DatasetImageRecord(

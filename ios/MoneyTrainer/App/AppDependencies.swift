@@ -11,21 +11,33 @@ final class AppDependencies {
     let trainingService: TrainingService
     let modelService: ModelService
     let modelManager: ModelManager
+    let connectionMonitor: ConnectionMonitor
+    let imageStore: DatasetImageStore
+    let developerSettings: DeveloperSettings
 
     init(configurationStore: APIConfigurationStore = APIConfigurationStore()) {
         self.configurationStore = configurationStore
         let configuration = configurationStore.configuration
         let client = APIClient(baseURL: configuration.baseURL, token: configuration.token)
         apiClient = client
-        datasetService = DatasetService(client: client)
+        let dataset = DatasetService(client: client)
+        datasetService = dataset
         inferenceService = InferenceService(client: client)
         trainingService = TrainingService(client: client)
         modelService = ModelService(client: client)
         modelManager = ModelManager(service: ModelService(client: client))
+        connectionMonitor = ConnectionMonitor(service: dataset)
+        imageStore = DatasetImageStore(service: dataset)
+        developerSettings = DeveloperSettings()
     }
 
     func applyConfiguration() async {
         let configuration = configurationStore.configuration
-        await apiClient.updateConfiguration(baseURL: configuration.baseURL, token: configuration.token)
+        await apiClient.updateConfiguration(
+            baseURL: configuration.baseURL,
+            token: configuration.token
+        )
+        imageStore.removeAll()
+        await connectionMonitor.checkAndWait()
     }
 }

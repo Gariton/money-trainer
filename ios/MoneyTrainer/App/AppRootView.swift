@@ -17,7 +17,10 @@ struct AppRootView: View {
             )
         )
         _trainingViewModel = State(
-            initialValue: TrainingViewModel(service: dependencies.trainingService)
+            initialValue: TrainingViewModel(
+                service: dependencies.trainingService,
+                developerSettings: dependencies.developerSettings
+            )
         )
         _modelsViewModel = State(
             initialValue: ModelsViewModel(manager: dependencies.modelManager)
@@ -26,28 +29,36 @@ struct AppRootView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            Tab("Dataset", systemImage: "photo.stack", value: .dataset) {
+            Tab(AppTab.dataset.title, systemImage: AppTab.dataset.symbolName, value: .dataset) {
                 DatasetView(viewModel: datasetViewModel, service: dependencies.datasetService)
             }
 
-            Tab("Training", systemImage: "bolt.horizontal.circle", value: .training) {
-                TrainingView(viewModel: trainingViewModel)
-            }
-
-            Tab("Models", systemImage: "shippingbox", value: .models) {
-                ModelsView(viewModel: modelsViewModel)
-            }
-
-            Tab("Live Test", systemImage: "viewfinder", value: .liveTest) {
-                LiveTestView(
-                    modelManager: dependencies.modelManager,
-                    datasetService: dependencies.datasetService
+            Tab(AppTab.training.title, systemImage: AppTab.training.symbolName, value: .training) {
+                TrainingView(
+                    viewModel: trainingViewModel,
+                    onOpenDataset: { selection = .dataset }
                 )
             }
 
-            Tab("Settings", systemImage: "gearshape", value: .settings) {
+            Tab(AppTab.models.title, systemImage: AppTab.models.symbolName, value: .models) {
+                ModelsView(viewModel: modelsViewModel)
+            }
+
+            Tab(AppTab.liveTest.title, systemImage: AppTab.liveTest.symbolName, value: .liveTest) {
+                LiveTestView(
+                    modelManager: dependencies.modelManager,
+                    datasetService: dependencies.datasetService,
+                    onOpenModels: { selection = .models }
+                )
+            }
+
+            Tab(AppTab.settings.title, systemImage: AppTab.settings.symbolName, value: .settings) {
                 SettingsView(dependencies: dependencies)
             }
         }
+        .environment(dependencies.imageStore)
+        .environment(dependencies.connectionMonitor)
+        .environment(\.openSettings, OpenSettingsAction { selection = .settings })
+        .task { await dependencies.connectionMonitor.checkAndWait() }
     }
 }

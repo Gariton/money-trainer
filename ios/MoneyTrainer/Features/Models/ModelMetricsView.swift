@@ -1,37 +1,71 @@
 import SwiftUI
 
+/// パーセントの羅列をやめ、0-100%のスケール上に棒で置く。
+/// 基準（有効化中のモデル）は縦線で示し、良し悪しを一目で分かるようにする。
 struct ModelMetricsView: View {
     let metrics: ModelMetrics
-    let previousMetrics: ModelMetrics?
+    let baselineMetrics: ModelMetrics?
 
-    var body: some View {
-        VStack(alignment: .leading) {
-            Grid(alignment: .leading) {
-                metricRow("mAP50", value: metrics.map50, previous: previousMetrics?.map50)
-                metricRow("mAP50–95", value: metrics.map50To95, previous: previousMetrics?.map50To95)
-                metricRow("Precision", value: metrics.precision, previous: previousMetrics?.precision)
-                metricRow("Recall", value: metrics.recall, previous: previousMetrics?.recall)
-            }
-
-            if !metrics.perClass.isEmpty {
-                PerClassMetricsView(metrics: metrics.perClass)
-            }
-        }
-        .font(.footnote)
+    private var rows: [(name: String, value: Double, baseline: Double?)] {
+        [
+            ("mAP50", metrics.map50, baselineMetrics?.map50),
+            ("mAP50–95", metrics.map50To95, baselineMetrics?.map50To95),
+            ("Precision", metrics.precision, baselineMetrics?.precision),
+            ("Recall", metrics.recall, baselineMetrics?.recall)
+        ]
     }
 
-    private func metricRow(_ name: String, value: Double, previous: Double?) -> some View {
-        GridRow {
-            Text(name)
-            Text(value, format: .percent.precision(.fractionLength(1)))
-                .monospacedDigit()
-            if let previous {
-                let difference = value - previous
-                Text(difference, format: .percent.sign(strategy: .always()).precision(.fractionLength(1)))
-                    .monospacedDigit()
-                    .foregroundStyle(difference >= 0 ? .green : .red)
-                    .accessibilityLabel("前モデルとの差")
+    var body: some View {
+        VStack(spacing: DesignTokens.Spacing.regular) {
+            ForEach(rows, id: \.name) { row in
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.tight) {
+                    HStack(spacing: DesignTokens.Spacing.compact) {
+                        Text(row.name)
+                            .font(.footnote)
+                        Spacer(minLength: 0)
+                        Text(row.value, format: .percent.precision(.fractionLength(1)))
+                            .font(.footnote.weight(.semibold))
+                            .monospacedDigit()
+                        if let baseline = row.baseline {
+                            difference(row.value - baseline)
+                        }
+                    }
+
+                    MeterBar(
+                        value: row.value,
+                        tint: .mtAccent,
+                        target: row.baseline
+                    )
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(row.name)
+                .accessibilityValue(
+                    row.value.formatted(.percent.precision(.fractionLength(1)))
+                )
             }
+        }
+    }
+
+    @ViewBuilder
+    private func difference(_ value: Double) -> some View {
+        if abs(value) < 0.0005 {
+            Text("±0.0%")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+        } else {
+            Label {
+                Text(
+                    value,
+                    format: .percent.sign(strategy: .always()).precision(.fractionLength(1))
+                )
+                .monospacedDigit()
+            } icon: {
+                Image(systemName: value > 0 ? "arrow.up" : "arrow.down")
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(value > 0 ? Color.mtSuccess : Color.mtDanger)
+            .accessibilityLabel("有効化中のモデルとの差")
         }
     }
 }

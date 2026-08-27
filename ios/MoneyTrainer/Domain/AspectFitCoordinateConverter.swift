@@ -51,12 +51,16 @@ struct AspectFitCoordinateConverter: Equatable, Sendable {
         ).clamped()
     }
 
-    func normalizedTranslation(for displayTranslation: CGSize) -> CGSize {
+    func normalizedTranslation(
+        for displayTranslation: CGSize,
+        viewportScale: CGFloat = 1
+    ) -> CGSize {
         let frame = imageFrame
         guard frame.width > 0, frame.height > 0 else { return .zero }
+        let safeScale = max(viewportScale, 1)
         return CGSize(
-            width: displayTranslation.width / frame.width,
-            height: displayTranslation.height / frame.height
+            width: displayTranslation.width / (frame.width * safeScale),
+            height: displayTranslation.height / (frame.height * safeScale)
         )
     }
 }

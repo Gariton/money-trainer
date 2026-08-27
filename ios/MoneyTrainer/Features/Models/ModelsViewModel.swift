@@ -12,6 +12,12 @@ final class ModelsViewModel {
 
     var models: [ModelRecord] { manager.remoteModels }
     var isLoading: Bool { manager.isLoading }
+    var activeModel: ModelRecord? { manager.activeModel }
+
+    /// 有効化中のモデルを基準に差分を出す。並び順に依存させない。
+    var baselineMetrics: ModelMetrics? {
+        manager.activeModel?.metrics
+    }
 
     func load() async {
         await manager.load()
@@ -28,9 +34,9 @@ final class ModelsViewModel {
     func activate(_ local: LocalModelRecord) async {
         do {
             try await manager.activate(local)
+            Haptics.success()
         } catch {
-            manager.errorMessage = error.localizedDescription
-            manager.isShowingError = true
+            manager.showError(error)
         }
     }
 

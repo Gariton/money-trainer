@@ -5,8 +5,17 @@ struct TrainingStatusIcon: View {
 
     var body: some View {
         Image(systemName: symbolName)
-            .foregroundStyle(style)
+            .foregroundStyle(tint)
             .accessibilityLabel(status.displayName)
+    }
+
+    var tint: Color {
+        switch status {
+        case .completed: .mtSuccess
+        case .failed: .mtDanger
+        case .queued: .mtIdle
+        default: .mtAccent
+        }
     }
 
     private var symbolName: String {
@@ -15,14 +24,6 @@ struct TrainingStatusIcon: View {
         case .failed: "xmark.octagon.fill"
         case .queued: "clock"
         default: "gearshape.2"
-        }
-    }
-
-    private var style: Color {
-        switch status {
-        case .completed: .green
-        case .failed: .red
-        default: .secondary
         }
     }
 }
