@@ -32,4 +32,63 @@ struct AspectFitCoordinateConverterTests {
         #expect(abs(result.maxX - 1) < 0.0001)
         #expect(abs(result.minY) < 0.0001)
     }
+
+    @Test("Corner resizing keeps the opposite corner fixed")
+    func cornerResizing() {
+        let initial = NormalizedRect(
+            centerX: 0.5,
+            centerY: 0.5,
+            width: 0.4,
+            height: 0.4
+        )
+
+        let result = initial.resized(
+            at: .topLeft,
+            by: CGSize(width: -0.1, height: 0.05)
+        )
+
+        #expect(abs(result.minX - 0.2) < 0.0001)
+        #expect(abs(result.minY - 0.35) < 0.0001)
+        #expect(abs(result.maxX - initial.maxX) < 0.0001)
+        #expect(abs(result.maxY - initial.maxY) < 0.0001)
+        #expect(result.isValid)
+    }
+
+    @Test("Corner resizing clamps the dragged edges without shifting the opposite edges")
+    func cornerResizeClamping() {
+        let initial = NormalizedRect(
+            centerX: 0.5,
+            centerY: 0.5,
+            width: 0.4,
+            height: 0.4
+        )
+
+        let result = initial.resized(
+            at: .bottomRight,
+            by: CGSize(width: 1, height: -1),
+            minimumSize: 0.05
+        )
+
+        #expect(abs(result.minX - initial.minX) < 0.0001)
+        #expect(abs(result.minY - initial.minY) < 0.0001)
+        #expect(abs(result.maxX - 1) < 0.0001)
+        #expect(abs(result.maxY - (initial.minY + 0.05)) < 0.0001)
+        #expect(result.isValid)
+    }
+
+    @Test("Viewport zoom converts screen drag distance at the visual scale")
+    func zoomedTranslation() {
+        let converter = AspectFitCoordinateConverter(
+            imageSize: CGSize(width: 1_000, height: 500),
+            canvasSize: CGSize(width: 400, height: 400)
+        )
+
+        let translation = converter.normalizedTranslation(
+            for: CGSize(width: 80, height: 40),
+            viewportScale: 4
+        )
+
+        #expect(abs(translation.width - 0.05) < 0.0001)
+        #expect(abs(translation.height - 0.05) < 0.0001)
+    }
 }

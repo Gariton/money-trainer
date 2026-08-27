@@ -65,7 +65,12 @@ struct DatasetView: View {
                 }
             }
             .overlay {
-                if viewModel.isLoading && viewModel.images.isEmpty {
+                if viewModel.isPreparingDraft {
+                    ProgressView("硬貨候補を検出中")
+                        .padding()
+                        .background(.regularMaterial)
+                        .clipShape(.rect(cornerRadius: DesignTokens.compactCornerRadius))
+                } else if viewModel.isLoading && viewModel.images.isEmpty {
                     ProgressView("Datasetを読み込み中")
                 }
             }

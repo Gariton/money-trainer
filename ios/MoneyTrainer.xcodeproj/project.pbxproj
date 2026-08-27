@@ -127,6 +127,15 @@
 		FB8567F971E79786CA222D4F /* MockInferenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC6D748F653B483DC2803AE2 /* MockInferenceService.swift */; };
 		FD61D35D5D7E4B1BD587A796 /* ModelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6B3108F7C8E0BFE3B0FCF0 /* ModelRow.swift */; };
 		FF40DA8C4C5217FC0AC1BE8C /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B9FEB63FDF1E84941BC214 /* AnnotationCanvasView.swift */; };
+		F10000000000000000000001 /* BoundingBoxResizeHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000002 /* BoundingBoxResizeHandle.swift */; };
+		F10000000000000000000003 /* AnnotationZoomControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000004 /* AnnotationZoomControls.swift */; };
+		F10000000000000000000005 /* BoundingBoxOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000006 /* BoundingBoxOutline.swift */; };
+		F10000000000000000000007 /* BoundingBoxResizeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000008 /* BoundingBoxResizeControl.swift */; };
+		F10000000000000000000009 /* BoundingBoxAnnotationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000010 /* BoundingBoxAnnotationLabel.swift */; };
+		F20000000000000000000001 /* CoinCircleDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002 /* CoinCircleDetector.swift */; };
+		F20000000000000000000003 /* CoinCircleDetecting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000004 /* CoinCircleDetecting.swift */; };
+		F20000000000000000000005 /* CoinCircleDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000006 /* CoinCircleDetectorTests.swift */; };
+		F20000000000000000000007 /* MockCoinCircleDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000008 /* MockCoinCircleDetector.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -170,7 +179,7 @@
 		3E0D8DD32901DC6E248633B7 /* AspectFitCoordinateConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectFitCoordinateConverterTests.swift; sourceTree = "<group>"; };
 		3F26A8A94742849B79E51631 /* MoneyTrainerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MoneyTrainerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FC41E5EF0731C18C7A4E8D0 /* ClassMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassMetrics.swift; sourceTree = "<group>"; };
-		45CB22638462A95170CAF9A9 /* MoneyTrainer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MoneyTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		45CB22638462A95170CAF9A9 /* MoneyTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneyTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4612F9B3271105C55572D372 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		47393FBA4AE6FC2CF1108D73 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		48735B7BD82D0E8BAFF77F7F /* DatasetServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatasetServiceTests.swift; sourceTree = "<group>"; };
@@ -259,6 +268,15 @@
 		F3A2DE1764325EC6B75DA647 /* ModelMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMetrics.swift; sourceTree = "<group>"; };
 		F8B2720CDA7BA0F46D6A2DB7 /* ServerErrorPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerErrorPayloadTests.swift; sourceTree = "<group>"; };
 		F96FAE576BDDF0A1C6CE31AF /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
+		F10000000000000000000002 /* BoundingBoxResizeHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxResizeHandle.swift; sourceTree = "<group>"; };
+		F10000000000000000000004 /* AnnotationZoomControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationZoomControls.swift; sourceTree = "<group>"; };
+		F10000000000000000000006 /* BoundingBoxOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxOutline.swift; sourceTree = "<group>"; };
+		F10000000000000000000008 /* BoundingBoxResizeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxResizeControl.swift; sourceTree = "<group>"; };
+		F10000000000000000000010 /* BoundingBoxAnnotationLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBoxAnnotationLabel.swift; sourceTree = "<group>"; };
+		F20000000000000000000002 /* CoinCircleDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinCircleDetector.swift; sourceTree = "<group>"; };
+		F20000000000000000000004 /* CoinCircleDetecting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinCircleDetecting.swift; sourceTree = "<group>"; };
+		F20000000000000000000006 /* CoinCircleDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinCircleDetectorTests.swift; sourceTree = "<group>"; };
+		F20000000000000000000008 /* MockCoinCircleDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCoinCircleDetector.swift; sourceTree = "<group>"; };
 		FDF7074BC2FAD0EA8D643DEB /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
 		FF416C43FE970A2141459E2B /* DatasetStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatasetStats.swift; sourceTree = "<group>"; };
 		FF6B3108F7C8E0BFE3B0FCF0 /* ModelRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRow.swift; sourceTree = "<group>"; };
@@ -272,6 +290,7 @@
 				172EFD64D7715110D8132DD4 /* AnnotationDraft.swift */,
 				4E21C23B44635B5D531071CA /* AnnotationUpdateRequest.swift */,
 				297997F9A7A767406770BEF7 /* AspectFitCoordinateConverter.swift */,
+				F10000000000000000000002 /* BoundingBoxResizeHandle.swift */,
 				3FC41E5EF0731C18C7A4E8D0 /* ClassMetrics.swift */,
 				09215E11D8D4098913EEE461 /* CoinDenomination.swift */,
 				6420D1DD48996B8C57AF60DF /* DatasetImagePage.swift */,
@@ -353,11 +372,13 @@
 				EF7BC93729D67A761187B965 /* AnnotationCodingTests.swift */,
 				8B65A6A5D0050466A6A0050B /* APIRequestBuilderTests.swift */,
 				3E0D8DD32901DC6E248633B7 /* AspectFitCoordinateConverterTests.swift */,
+				F20000000000000000000006 /* CoinCircleDetectorTests.swift */,
 				48735B7BD82D0E8BAFF77F7F /* DatasetServiceTests.swift */,
 				2F2E70EF04105378007EFC41 /* DatasetStatsCodingTests.swift */,
 				A8160B209749BD6B36C690D5 /* DatasetViewModelTests.swift */,
 				92E5975D5174661E4BFA0C49 /* FailureReportServiceTests.swift */,
 				7EC19E371104F50088EFC44A /* ImageDataNormalizerTests.swift */,
+				F20000000000000000000008 /* MockCoinCircleDetector.swift */,
 				F2713F2578A392C94C78F303 /* MockDatasetService.swift */,
 				CC6D748F653B483DC2803AE2 /* MockInferenceService.swift */,
 				657C99443F5593D8BD3F4A8A /* MockModelService.swift */,
@@ -376,6 +397,8 @@
 		640F74DB6F1316602F25ADCF /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F20000000000000000000004 /* CoinCircleDetecting.swift */,
+				F20000000000000000000002 /* CoinCircleDetector.swift */,
 				0708DE12E970A73D17A9A112 /* DatasetService.swift */,
 				14DFB4AD53D08A5BE6A1A255 /* DatasetServiceProtocol.swift */,
 				C85DB1C5E27AEC409172C182 /* InferenceService.swift */,
@@ -474,8 +497,12 @@
 				7F4F5DC08CF19CAB7E88FA8B /* AnnotationEditorView.swift */,
 				CCE7EAEEB6B637414B720838 /* AnnotationEditorViewModel.swift */,
 				DA11533D48021D4E94DA8EEB /* AnnotationInspectorView.swift */,
+				F10000000000000000000004 /* AnnotationZoomControls.swift */,
+				F10000000000000000000010 /* BoundingBoxAnnotationLabel.swift */,
 				D63B17E3D4AA452FDFD3B60C /* BoundingBoxLabel.swift */,
+				F10000000000000000000006 /* BoundingBoxOutline.swift */,
 				A5D3C7809638263F2B8F279C /* BoundingBoxOverlay.swift */,
+				F10000000000000000000008 /* BoundingBoxResizeControl.swift */,
 			);
 			path = Annotation;
 			sourceTree = "<group>";
@@ -575,8 +602,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 52AAD83C7CDAE7BBC2308369 /* Build configuration list for PBXProject "MoneyTrainer" */;
 			developmentRegion = en;
@@ -617,18 +642,25 @@
 				940E836B50C36801879A4C8F /* AnnotationEditorView.swift in Sources */,
 				162ADBFB574A16997085078E /* AnnotationEditorViewModel.swift in Sources */,
 				4CBED955A68AE3E5ACA88EEE /* AnnotationInspectorView.swift in Sources */,
+				F10000000000000000000003 /* AnnotationZoomControls.swift in Sources */,
 				4BF4728DB70ACBF156C29B00 /* AnnotationUpdateRequest.swift in Sources */,
 				3C8900A9892E5A67D614579C /* AppDependencies.swift in Sources */,
 				85C78447B144D703932D0407 /* AppRootView.swift in Sources */,
 				E285729B69008C0ABB32BF31 /* AppTab.swift in Sources */,
 				0DDC93D17A0FFFCAD2EAB877 /* AspectFitCoordinateConverter.swift in Sources */,
 				FB67964146B1463AF133D37E /* BoundingBoxLabel.swift in Sources */,
+				F10000000000000000000009 /* BoundingBoxAnnotationLabel.swift in Sources */,
+				F10000000000000000000005 /* BoundingBoxOutline.swift in Sources */,
 				06EE42EE5C4C57DCFEA8AF25 /* BoundingBoxOverlay.swift in Sources */,
+				F10000000000000000000007 /* BoundingBoxResizeControl.swift in Sources */,
+				F10000000000000000000001 /* BoundingBoxResizeHandle.swift in Sources */,
 				3CF824854AF4609819950435 /* CameraCaptureError.swift in Sources */,
 				5EF17868E6318AC2570B506B /* CameraCaptureView.swift in Sources */,
 				8B3B04EAA1A649260301D5BF /* CameraCaptureViewModel.swift in Sources */,
 				19258508536F98287D3D5DBA /* CameraPreview.swift in Sources */,
 				9C490C6862036CCCBE5E579B /* ClassMetrics.swift in Sources */,
+				F20000000000000000000001 /* CoinCircleDetector.swift in Sources */,
+				F20000000000000000000003 /* CoinCircleDetecting.swift in Sources */,
 				3CD81F9464F96D1F21715517 /* CoinCountSummaryView.swift in Sources */,
 				A605A761F6AFFA775F74DDBA /* CoinDenomination.swift in Sources */,
 				87D55675559A38FD6A16C3C9 /* DatasetImagePage.swift in Sources */,
@@ -714,11 +746,13 @@
 				6EEF6343842853DFC99EED24 /* APIRequestBuilderTests.swift in Sources */,
 				2F38F0F887C1EF27ED845D91 /* AnnotationCodingTests.swift in Sources */,
 				CB565AB5C876A9839558D080 /* AspectFitCoordinateConverterTests.swift in Sources */,
+				F20000000000000000000005 /* CoinCircleDetectorTests.swift in Sources */,
 				65BD4FC07862497C4AC3B556 /* DatasetServiceTests.swift in Sources */,
 				7AFF4A118629E24A716D650F /* DatasetStatsCodingTests.swift in Sources */,
 				CA795C4B57C40C65837BE47E /* DatasetViewModelTests.swift in Sources */,
 				A9507FCBE53DC8CF81819E41 /* FailureReportServiceTests.swift in Sources */,
 				4C59415654EEAE1C0D4AC530 /* ImageDataNormalizerTests.swift in Sources */,
+				F20000000000000000000007 /* MockCoinCircleDetector.swift in Sources */,
 				1ED981F332CDEB00C6BF8E45 /* MockDatasetService.swift in Sources */,
 				FB8567F971E79786CA222D4F /* MockInferenceService.swift in Sources */,
 				F6230D59BA8FA0D264BBE45B /* MockModelService.swift in Sources */,
@@ -749,6 +783,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = T3RY6S8S7E;
 				INFOPLIST_FILE = MoneyTrainer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -823,6 +858,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = T3RY6S8S7E;
 				INFOPLIST_FILE = MoneyTrainer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

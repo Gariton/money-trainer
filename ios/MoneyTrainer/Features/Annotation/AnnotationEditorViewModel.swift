@@ -60,14 +60,23 @@ final class AnnotationEditorViewModel {
         self.selectedAnnotationID = annotations.first?.id
     }
 
+    func confirmSelected() {
+        guard let index = selectedIndex else { return }
+        annotations[index].needsReview = false
+    }
+
     func move(
         id: UUID,
         from initialRect: NormalizedRect,
         displayTranslation: CGSize,
+        viewportScale: CGFloat,
         converter: AspectFitCoordinateConverter
     ) {
         guard let index = annotations.firstIndex(where: { $0.id == id }) else { return }
-        let translation = converter.normalizedTranslation(for: displayTranslation)
+        let translation = converter.normalizedTranslation(
+            for: displayTranslation,
+            viewportScale: viewportScale
+        )
         annotations[index].rect = NormalizedRect(
             centerX: initialRect.centerX + translation.width,
             centerY: initialRect.centerY + translation.height,
@@ -79,16 +88,17 @@ final class AnnotationEditorViewModel {
     func resize(
         id: UUID,
         from initialRect: NormalizedRect,
+        at handle: BoundingBoxResizeHandle,
         displayTranslation: CGSize,
+        viewportScale: CGFloat,
         converter: AspectFitCoordinateConverter
     ) {
         guard let index = annotations.firstIndex(where: { $0.id == id }) else { return }
-        var displayRect = converter.displayRect(for: initialRect)
-        displayRect.size.width += displayTranslation.width
-        displayRect.size.height += displayTranslation.height
-        displayRect.size.width = max(displayRect.width, DesignTokens.minimumTapSize)
-        displayRect.size.height = max(displayRect.height, DesignTokens.minimumTapSize)
-        annotations[index].rect = converter.normalizedRect(from: displayRect)
+        let translation = converter.normalizedTranslation(
+            for: displayTranslation,
+            viewportScale: viewportScale
+        )
+        annotations[index].rect = initialRect.resized(at: handle, by: translation)
     }
 
     func save() async -> Bool {

@@ -22,8 +22,9 @@ struct Annotation: Codable, Equatable, Identifiable, Sendable {
     }
 
     func requiresReview(threshold: Double) -> Bool {
+        if let needsReview { return needsReview }
         guard let confidence else { return false }
-        return needsReview ?? (confidence < threshold)
+        return confidence < threshold
     }
 
     private enum CodingKeys: String, CodingKey {

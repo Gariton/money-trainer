@@ -16,12 +16,24 @@ struct AnnotationInspectorView: View {
                 }
                 .pickerStyle(.segmented)
 
-                if viewModel.selectedAnnotation?.requiresReview(
+                if let selectedAnnotation = viewModel.selectedAnnotation,
+                   selectedAnnotation.requiresReview(
                     threshold: DesignTokens.lowConfidenceThreshold
-                ) == true {
-                    Label("低confidenceのため要確認", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.red)
-                        .accessibilityLabel("要確認: 低confidence")
+                   ) {
+                    if selectedAnnotation.confidence == nil {
+                        Label("円形候補です。金種を確認してください", systemImage: "circle.dashed")
+                            .foregroundStyle(.orange)
+                        Button(
+                            "この金種で確定",
+                            systemImage: "checkmark.circle",
+                            action: viewModel.confirmSelected
+                        )
+                        .buttonStyle(.borderedProminent)
+                    } else {
+                        Label("低confidenceのため要確認", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .accessibilityLabel("要確認: 低confidence")
+                    }
                 }
             }
         }

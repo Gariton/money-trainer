@@ -6,8 +6,13 @@ struct BoundingBoxLabel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
-            Text(annotation.denomination.displayName)
-                .bold()
+            if annotation.needsReview == true && annotation.confidence == nil {
+                Label("円形候補", systemImage: "circle.dashed")
+                    .bold()
+            } else {
+                Text(annotation.denomination.displayName)
+                    .bold()
+            }
             if let confidence = annotation.confidence {
                 Text(confidence, format: .percent.precision(.fractionLength(0)))
             }
